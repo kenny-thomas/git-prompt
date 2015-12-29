@@ -24,6 +24,7 @@
         conf=/etc/git-prompt.conf;              [[ -r $conf ]]  && . $conf
         conf=~/.git-prompt.conf;                [[ -r $conf ]]  && . $conf
         conf=~/.config/git-prompt.conf;         [[ -r $conf ]]  && . $conf
+        conf=~/.shared/modules/git-prompt/git-prompt.conf;         [[ -r $conf ]]  && . $conf
         unset conf
 
 
@@ -529,7 +530,7 @@ parse_git_status() {
         fi
 
         #### branch
-        branch=${branch/#master/M}
+        #branch=${branch/#master/M}
 
                         # another method of above:
                         # branch=$(git symbolic-ref -q HEAD || { echo -n "detached:" ; git name-rev --name-only HEAD 2>/dev/null; } )
