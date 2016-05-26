@@ -178,7 +178,7 @@ cwd_truncate() {
         # arg1: max path lenght
         # returns abbrivated $PWD  in public "cwd" var
 
-        cwd="${PWD/$HOME/~}"             # substitute  "~"
+        cwd="${PWD/$HOME/\~}"             # substitute  "~"
 
         case $1 in
                 full)
@@ -424,6 +424,7 @@ parse_git_status() {
         #git_dir=` git rev-parse --git-dir 2> /dev/null`
 
         [[  -n ${git_dir/./} ]]   ||   return  1
+        [[  -f ${git_dir}/git-prompt-ignored ]]   &&   return  1
 
         vcs=git
 
