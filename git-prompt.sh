@@ -67,7 +67,7 @@
                    op_vcs_color=${op_vcs_color:-MAGENTA}
              detached_vcs_color=${detached_vcs_color:-RED}
 
-                  hex_vcs_color=${hex_vcs_color:-BLACK}         # gray
+                  hex_vcs_color=${hex_vcs_color:-yellow}         # gray
 
 
         max_file_list_length=${max_file_list_length:-100}
@@ -135,6 +135,16 @@
                 dim='\['`tput sgr0; tput setaf p1`'\]'  # half-bright
 
             bw_bold='\['`tput bold`'\]'
+
+        cols=`tput colors`                              # in emacs shell-mode tput colors returns -1
+        if [[ -n "$cols" && $cols -ge 80 ]];  then       #  if terminal supports colors
+             yellow='\['`tput sgr0; tput setaf 184`'\]'
+            magenta='\['`tput sgr0; tput setaf 162`'\]'
+                RED='\['`tput setaf 196; tput bold`'\]'
+             YELLOW='\['`tput setaf 226; tput bold`'\]'
+               BLUE='\['`tput setaf 75; tput bold`'\]'
+        fi
+        unset cols
 
         on=''
         off=': '
