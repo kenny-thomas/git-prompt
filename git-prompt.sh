@@ -141,6 +141,7 @@
              yellow='\['`tput sgr0; tput setaf 184`'\]'
             magenta='\['`tput sgr0; tput setaf 162`'\]'
                 RED='\['`tput setaf 196; tput bold`'\]'
+              GREEN='\['`tput setaf 40; tput bold`'\]'
              YELLOW='\['`tput setaf 226; tput bold`'\]'
                BLUE='\['`tput setaf 75; tput bold`'\]'
         fi
@@ -725,7 +726,7 @@ prompt_command_function() {
         # else eval cwd_cmd,  cwd should have path after exection
         eval "${cwd_cmd/\\/cwd=\\\\}"
 
-        PS1="$colors_reset$green[$(date +%H:%M)]$colors_reset-$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
+        PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
 
         unset head_local tail_local pwd
  }
