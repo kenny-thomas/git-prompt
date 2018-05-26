@@ -33,6 +33,7 @@
         git_module=${git_module:-on}
         svn_module=${svn_module:-off}
         hg_module=${hg_module:-on}
+        plenv_module=${plenv_module:-on}
         vim_module=${vim_module:-on}
         virtualenv_module=${virtualenv_module:-on}
         error_bell=${error_bell:-off}
@@ -664,6 +665,15 @@ parse_virtualenv_status() {
     fi
  }
 
+parse_plenv_status() {
+    type plenv  >&/dev/null || return
+
+    unset plenv_root
+
+    plenv_root="$(plenv local 2>/dev/null)"
+    [[ "t${plenv_root}" != "t" ]] && plenv_root="${BLUE}{${plenv_root}}${colors_reset}-"
+}
+
 disable_set_shell_label() {
         trap - DEBUG  >& /dev/null
  }
@@ -716,6 +726,7 @@ prompt_command_function() {
 
 	parse_virtualenv_status
         parse_vcs_status
+        parse_plenv_status
 
         # autojump
         if [[ ${aj_dir_list[aj_idx%aj_max]} != $PWD ]] ; then
@@ -726,9 +737,9 @@ prompt_command_function() {
         # else eval cwd_cmd,  cwd should have path after exection
         eval "${cwd_cmd/\\/cwd=\\\\}"
 
-        PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
+        PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-${plenv_root}$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
 
-        unset head_local tail_local pwd
+        unset head_local tail_local pwd plenv_root
  }
 
         PROMPT_COMMAND=prompt_command_function
