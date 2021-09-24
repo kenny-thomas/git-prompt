@@ -493,7 +493,7 @@ parse_git_status() {
             )"
 
         else
-            # Dor large repos, don't expend time trying to generate detailed info
+            # For large repos, don't expend time trying to generate detailed info
             branch="$(cut -b 17-37 < ${git_dir}/HEAD) L"
             clean=clean
         fi
@@ -678,9 +678,8 @@ parse_virtualenv_status() {
  }
 
 parse_plenv_status() {
-    type plenv  >&/dev/null || return
-
     unset plenv_root
+    type plenv  >&/dev/null || return
 
     plenv_root="$(plenv local 2>/dev/null)"
     [[ "t${plenv_root}" != "t" ]] && plenv_root="${BLUE}{${plenv_root}}${colors_reset}-"
