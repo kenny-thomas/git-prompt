@@ -751,6 +751,21 @@ prompt_command_function() {
         PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-${plenv_root}$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
 
         unset head_local tail_local pwd plenv_root
+
+        case $TERM in
+          linux)
+            echo -ne "\033]0;${HOSTNAME%%.*}\007"
+            ;;
+          xterm*)
+            echo -ne "\033]0;${HOSTNAME%%.*}\007"
+            ;;
+          screen*)
+            echo -ne "\033k${HOSTNAME%%.*}\033\\"
+            ;;
+          *)
+            ;;
+        esac
+
  }
 
         PROMPT_COMMAND=prompt_command_function
