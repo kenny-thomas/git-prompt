@@ -752,19 +752,19 @@ prompt_command_function() {
 
         unset head_local tail_local pwd plenv_root
 
-        case $TERM in
-          linux)
-            echo -ne "\033]0;${HOSTNAME%%.*}\007"
-            ;;
-          xterm*)
-            echo -ne "\033]0;${HOSTNAME%%.*}\007"
-            ;;
-          screen*)
-            echo -ne "\033k${HOSTNAME%%.*}\033\\"
-            ;;
-          *)
-            ;;
-        esac
+#         case $TERM in
+#           linux)
+#             echo -ne "\033]0;${HOSTNAME%%.*}\007"
+#             ;;
+#           xterm*)
+#             echo -ne "\033]0;${HOSTNAME%%.*}\007"
+#             ;;
+#           screen*)
+#             echo -ne "\033k${HOSTNAME%%.*}\033\\"
+#             ;;
+#           *)
+#             ;;
+#         esac
 
  }
 
