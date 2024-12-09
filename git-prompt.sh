@@ -409,7 +409,7 @@ set_shell_label() {
 
         # we don't need tty name under X11
         case $TERM in
-                xterm* | screen* | rxvt* | gnome-terminal | konsole | eterm* | wterm | cygwin)  unset tty ;;
+                xterm* | screen* | rxvt* | gnome-terminal | konsole | eterm* | wterm | cygwin | tmux*)  unset tty ;;
                 *);;
         esac
 
