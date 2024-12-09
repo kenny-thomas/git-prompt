@@ -208,7 +208,7 @@ cache_colors() {
 
         # Use case statement for color assignments based on detected terminal colors
         case "$TERMINAL_COLORS" in
-            "24bit")
+            24bit)
                 # True color (24-bit) RGB values
                 export COLOR_ORANGE="\e[38;2;255;140;0m"   # RGB for orange
                 export COLOR_GREEN="\e[38;2;50;205;50m"    # RGB for green
@@ -216,7 +216,7 @@ cache_colors() {
                 export COLOR_DARK_SLATE_GREY="\e[38;2;47;79;79m"  # RGB for dark slate grey
                 export COLOR_BG_SLATE_GREY="\e[48;2;47;79;79m"   # Background color for dark slate grey
                 ;;
-            "256")
+              256)
                 # Fall back to 256 colors
                 export COLOR_ORANGE=$(tput setaf 214)  # Orange for 256-color terminals
                 export COLOR_GREEN=$(tput setaf 46)   # Green for 256-color terminals
@@ -224,7 +224,7 @@ cache_colors() {
                 export COLOR_DARK_SLATE_GREY=$(tput setaf 235)  # Dark Slate Grey for 256-color terminals
                 export COLOR_BG_SLATE_GREY=$(tput setab 235)   # Background color for dark slate grey
                 ;;
-            "16")
+              16)
                 # Fall back to 16 colors
                 export COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 16-color terminals
                 export COLOR_GREEN=$(tput setaf 2)    # Green for 16-color terminals
