@@ -148,6 +148,8 @@
         fi
         unset cols
 
+
+
         on=''
         off=': '
         bell="\[`eval ${!error_bell} tput bel`\]"
@@ -183,6 +185,117 @@
 
         export who_where
 
+# Cache tput colors value using detect_colors
+detect_colors() {
+    if [ -n "$COLORTERM" ] && [ "$COLORTERM" = "truecolor" ] || [ "$(tput colors)" -ge 16777216 ]; then
+        echo "24bit"
+    elif [ "$(tput colors)" -ge 256 ]; then
+        echo "256"
+    else
+        echo "16"
+    fi
+}
+
+# Cache the value of tput colors in a global variable
+cache_colors() {
+    if [ -z "$COLOR_ORANGE" ]; then
+        # Store tput colors value in a variable to avoid calling tput repeatedly
+        local colors_supported
+        colors_supported=$(detect_colors)
+
+        # Cache the result of detect_colors globally
+        export TERMINAL_COLORS=$colors_supported
+
+        # Use case statement for color assignments based on detected terminal colors
+        case "$TERMINAL_COLORS" in
+            "24bit")
+                # True color (24-bit) RGB values
+                COLOR_ORANGE="\e[38;2;255;140;0m"   # RGB for orange
+                COLOR_GREEN="\e[38;2;50;205;50m"    # RGB for green
+                COLOR_BLUE="\e[38;2;30;144;255m"    # RGB for blue
+                COLOR_DARK_SLATE_GREY="\e[38;2;47;79;79m"  # RGB for dark slate grey
+                COLOR_BG_SLATE_GREY="\e[48;2;47;79;79m"   # Background color for dark slate grey
+                ;;
+            "256")
+                # Fall back to 256 colors
+                COLOR_ORANGE=$(tput setaf 214)  # Orange for 256-color terminals
+                COLOR_GREEN=$(tput setaf 46)   # Green for 256-color terminals
+                COLOR_BLUE=$(tput setaf 33)    # Blue for 256-color terminals
+                COLOR_DARK_SLATE_GREY=$(tput setaf 235)  # Dark Slate Grey for 256-color terminals
+                COLOR_BG_SLATE_GREY=$(tput setab 235)   # Background color for dark slate grey
+                ;;
+            "16")
+                # Fall back to 16 colors
+                COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 16-color terminals
+                COLOR_GREEN=$(tput setaf 2)    # Green for 16-color terminals
+                COLOR_BLUE=$(tput setaf 4)     # Blue for 16-color terminals
+                COLOR_DARK_SLATE_GREY=$(tput setaf 8)  # Grey for 16-color terminals
+                COLOR_BG_SLATE_GREY=$(tput setab 8)   # Background color for grey
+                ;;
+            *)
+                # Default fallback for terminals with fewer than 16 colors
+                COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 8-color terminals
+                COLOR_GREEN=$(tput setaf 2)    # Green for 8-color terminals
+                COLOR_BLUE=$(tput setaf 4)     # Blue for 8-color terminals
+                COLOR_DARK_SLATE_GREY=$(tput setaf 0)  # Black for 8-color terminals
+                COLOR_BG_SLATE_GREY=$(tput setab 0)   # Background color for black
+                ;;
+        esac
+
+        COLOR_RESET_FG="\e[39m"           # Reset only the foreground color
+        COLOR_RESET_BG="\e[49m"           # Reset only the background color
+    fi
+}
+
+# Function to detect versions of plenv, goenv, and luaenv, with fallback for Perl
+detect_env_versions() {
+    cache_colors
+    local versions=""
+
+    # Check for plenv
+    if command -v plenv >/dev/null 2>&1; then
+        local plenv_version
+        plenv_version=$(plenv version 2>/dev/null | awk '{print $1}')
+        if [ -n "$plenv_version" ]; then
+            versions="$versions ${COLOR_ORANGE}plenv:${plenv_version}${COLOR_RESET_FG}"
+        fi
+    fi
+
+    # Fallback for Perl if plenv isn't active
+    if ! echo "$versions" | grep -q "plenv"; then
+        local perl_path perl_dir
+        perl_path=$(command -v perl 2>/dev/null)
+        if [ -n "$perl_path" ]; then
+            perl_dir=$(dirname "$(dirname "$perl_path")")
+            if echo "$perl_dir" | grep -Eq '/[^/]+-perl$'; then
+                local custom_perl_version
+                custom_perl_version=$(basename "$perl_dir")
+                versions="$versions ${COLOR_ORANGE}perl:${custom_perl_version%-perl}${COLOR_RESET_FG}"
+            fi
+        fi
+    fi
+
+    # Check for goenv
+    if command -v goenv >/dev/null 2>&1; then
+        local goenv_version
+        goenv_version=$(goenv version 2>/dev/null | awk '{print $1}')
+        if [ -n "$goenv_version" ]; then
+            versions="$versions ${COLOR_GREEN}goenv:${goenv_version}${COLOR_RESET_FG}"
+        fi
+    fi
+
+    # Check for luaenv
+    if command -v luaenv >/dev/null 2>&1; then
+        local luaenv_version
+        luaenv_version=$(luaenv version 2>/dev/null | awk '{print $1}')
+        if [ -n "$luaenv_version" ]; then
+            versions="$versions ${COLOR_BLUE}luaenv:${luaenv_version}${COLOR_RESET_FG}"
+        fi
+    fi
+
+    # Trim leading/trailing whitespace and return result
+    echo "$versions" | sed 's/^ *//;s/ *$//'
+}
 
 cwd_truncate() {
         # based on:   https://www.blog.montgomerie.net/pwd-in-the-title-bar-or-a-regex-adventure-in-bash
@@ -726,7 +839,7 @@ prompt_command_function() {
 
 	parse_virtualenv_status
         parse_vcs_status
-        parse_plenv_status
+#        parse_plenv_status
 
         # autojump
         if [[ ${aj_dir_list[aj_idx%aj_max]} != $PWD ]] ; then
@@ -737,7 +850,7 @@ prompt_command_function() {
         # else eval cwd_cmd,  cwd should have path after exection
         eval "${cwd_cmd/\\/cwd=\\\\}"
 
-        PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-${plenv_root}$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
+        PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-$(detect_env_versions)$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
 
         unset head_local tail_local pwd plenv_root
  }
