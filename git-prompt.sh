@@ -409,7 +409,7 @@ set_shell_label() {
 
         # we don't need tty name under X11
         case $TERM in
-                xterm* | rxvt* | gnome-terminal | konsole | eterm* | wterm | cygwin)  unset tty ;;
+                xterm* | screen* | rxvt* | gnome-terminal | konsole | eterm* | wterm | cygwin)  unset tty ;;
                 *);;
         esac
 
@@ -564,41 +564,53 @@ parse_git_status() {
         # work around for VTE bug (hang on printf)
         unset VTE_VERSION
 
-	# info not in porcelain status
-        eval " $(
-                LANG=C git status --ignore-submodules 2>/dev/null |
-                    sed -n '
-                        s/^\(# \)*On branch /branch=/p
-                        s/^nothing to commi.*/clean=clean/p
-                        s/^\(# \)*Initial commi.*/init=init/p
-                        s/^\(# \)*Your branch is ahead of \(.\).\+\1 by [[:digit:]]\+ commit.*/freshness=${WHITE}↑/p
-                        s/^\(# \)*Your branch is behind \(.\).\+\1 by [[:digit:]]\+ commit.*/freshness=${YELLOW}↓/p
-                        s/^\(# \)*Your branch and \(.\).\+\1 have diverged.*/freshness=${YELLOW}↕/p
-                    '
-        )"
+        # get a count of files in the repo to see if we should use a shortened git status
+        file_count=`git ls-files |wc -l`
 
-	# porcelain file list
-                                        # TODO:  sed-less -- http://tldp.org/LDP/abs/html/arrays.html  -- Example 27-5
+        if [[ $file_count -lt 10000 ]]; then
 
-                                        # git bug:  (was reported to git@vger.kernel.org )
-                                        # echo 1 > "with space"
-                                        # git status --porcelain
-                                        # ?? with space                   <------------ NO QOUTES
-                                        # git add with\ space
-                                        # git status --porcelain
-                                        # A  "with space"                 <------------- WITH QOUTES
-
-        eval " $(
-                LANG=C git status --porcelain --ignore-submodules 2>/dev/null |
+            # info not in porcelain status
+            eval " $(
+                    LANG=C git status --ignore-submodules 2>/dev/null |
                         sed -n '
-                                s,^[MARC]. \([^\"][^/]*/\?\).*,         added=added;           [[ \" ${added_files[@]} \"      =~ \" \1 \" ]]   || added_files[${#added_files[@]}]=\"\1\",p
-                                s,^[MARC]. \"\([^/]\+/\?\).*\"$,        added=added;           [[ \" ${added_files[@]} \"      =~ \" \1 \" ]]   || added_files[${#added_files[@]}]=\"\1\",p
-                                s,^.[MAU] \([^\"][^/]*/\?\).*,          modified=modified;     [[ \" ${modified_files[@]} \"   =~ \" \1 \" ]]   || modified_files[${#modified_files[@]}]=\"\1\",p
-                                s,^.[MAU] \"\([^/]\+/\?\).*\"$,         modified=modified;     [[ \" ${modified_files[@]} \"   =~ \" \1 \" ]]   || modified_files[${#modified_files[@]}]=\"\1\",p
-                                s,^?? \([^\"][^/]*/\?\).*,              untracked=untracked;   [[ \" ${untracked_files[@]} \"  =~ \" \1 \" ]]   || untracked_files[${#untracked_files[@]}]=\"\1\",p
-                                s,^?? \"\([^/]\+/\?\).*\"$,             untracked=untracked;   [[ \" ${untracked_files[@]} \"  =~ \" \1 \" ]]   || untracked_files[${#untracked_files[@]}]=\"\1\",p
-                        '   # |tee /dev/tty
-        )"
+                            s/^\(# \)*On branch /branch=/p
+                            s/^nothing to commi.*/clean=clean/p
+                            s/^\(# \)*Initial commi.*/init=init/p
+                            s/^\(# \)*Your branch is ahead of \(.\).\+\1 by [[:digit:]]\+ commit.*/freshness=${WHITE}↑/p
+                            s/^\(# \)*Your branch is behind \(.\).\+\1 by [[:digit:]]\+ commit.*/freshness=${YELLOW}↓/p
+                            s/^\(# \)*Your branch and \(.\).\+\1 have diverged.*/freshness=${YELLOW}↕/p
+                        '
+            )"
+
+            # porcelain file list
+                                            # TODO:  sed-less -- http://tldp.org/LDP/abs/html/arrays.html  -- Example 27-5
+
+                                            # git bug:  (was reported to git@vger.kernel.org )
+                                            # echo 1 > "with space"
+                                            # git status --porcelain
+                                            # ?? with space                   <------------ NO QOUTES
+                                            # git add with\ space
+                                            # git status --porcelain
+                                            # A  "with space"                 <------------- WITH QOUTES
+
+            eval " $(
+                    LANG=C git status --porcelain --ignore-submodules 2>/dev/null |
+                            sed -n '
+                                    s,^[MARC]. \([^\"][^/]*/\?\).*,         added=added;           [[ \" ${added_files[@]} \"      =~ \" \1 \" ]]   || added_files[${#added_files[@]}]=\"\1\",p
+                                    s,^[MARC]. \"\([^/]\+/\?\).*\"$,        added=added;           [[ \" ${added_files[@]} \"      =~ \" \1 \" ]]   || added_files[${#added_files[@]}]=\"\1\",p
+                                    s,^.[MAU] \([^\"][^/]*/\?\).*,          modified=modified;     [[ \" ${modified_files[@]} \"   =~ \" \1 \" ]]   || modified_files[${#modified_files[@]}]=\"\1\",p
+                                    s,^.[MAU] \"\([^/]\+/\?\).*\"$,         modified=modified;     [[ \" ${modified_files[@]} \"   =~ \" \1 \" ]]   || modified_files[${#modified_files[@]}]=\"\1\",p
+                                    s,^?? \([^\"][^/]*/\?\).*,              untracked=untracked;   [[ \" ${untracked_files[@]} \"  =~ \" \1 \" ]]   || untracked_files[${#untracked_files[@]}]=\"\1\",p
+                                    s,^?? \"\([^/]\+/\?\).*\"$,             untracked=untracked;   [[ \" ${untracked_files[@]} \"  =~ \" \1 \" ]]   || untracked_files[${#untracked_files[@]}]=\"\1\",p
+                            '   # |tee /dev/tty
+            )"
+
+        else
+            # For large repos, don't expend time trying to generate detailed info
+            branch="$(cut -b 17-37 < ${git_dir}/HEAD) L"
+            clean=clean
+        fi
+
 
         if  ! grep -q "^ref:" "$git_dir/HEAD"  2>/dev/null;   then
                 detached=detached
@@ -779,9 +791,8 @@ parse_virtualenv_status() {
  }
 
 parse_plenv_status() {
-    type plenv  >&/dev/null || return
-
     unset plenv_root
+    type plenv  >&/dev/null || return
 
     plenv_root="$(plenv local 2>/dev/null)"
     [[ "t${plenv_root}" != "t" ]] && plenv_root="${BLUE}{${plenv_root}}${colors_reset}-"
@@ -853,6 +864,21 @@ prompt_command_function() {
         PS1="$colors_reset$GREEN[$(date +%H:%M)]$colors_reset-$(detect_env_versions)$rc$head_local$color_who_where$dir_color[$cwd]$tail_local$dir_color$prompt_char $colors_reset"
 
         unset head_local tail_local pwd plenv_root
+
+#         case $TERM in
+#           linux)
+#             echo -ne "\033]0;${HOSTNAME%%.*}\007"
+#             ;;
+#           xterm*)
+#             echo -ne "\033]0;${HOSTNAME%%.*}\007"
+#             ;;
+#           screen*)
+#             echo -ne "\033k${HOSTNAME%%.*}\033\\"
+#             ;;
+#           *)
+#             ;;
+#         esac
+
  }
 
         PROMPT_COMMAND=prompt_command_function
