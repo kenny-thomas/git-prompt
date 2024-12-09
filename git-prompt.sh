@@ -210,40 +210,40 @@ cache_colors() {
         case "$TERMINAL_COLORS" in
             "24bit")
                 # True color (24-bit) RGB values
-                COLOR_ORANGE="\e[38;2;255;140;0m"   # RGB for orange
-                COLOR_GREEN="\e[38;2;50;205;50m"    # RGB for green
-                COLOR_BLUE="\e[38;2;30;144;255m"    # RGB for blue
-                COLOR_DARK_SLATE_GREY="\e[38;2;47;79;79m"  # RGB for dark slate grey
-                COLOR_BG_SLATE_GREY="\e[48;2;47;79;79m"   # Background color for dark slate grey
+                export COLOR_ORANGE="\e[38;2;255;140;0m"   # RGB for orange
+                export COLOR_GREEN="\e[38;2;50;205;50m"    # RGB for green
+                export COLOR_BLUE="\e[38;2;30;144;255m"    # RGB for blue
+                export COLOR_DARK_SLATE_GREY="\e[38;2;47;79;79m"  # RGB for dark slate grey
+                export COLOR_BG_SLATE_GREY="\e[48;2;47;79;79m"   # Background color for dark slate grey
                 ;;
             "256")
                 # Fall back to 256 colors
-                COLOR_ORANGE=$(tput setaf 214)  # Orange for 256-color terminals
-                COLOR_GREEN=$(tput setaf 46)   # Green for 256-color terminals
-                COLOR_BLUE=$(tput setaf 33)    # Blue for 256-color terminals
-                COLOR_DARK_SLATE_GREY=$(tput setaf 235)  # Dark Slate Grey for 256-color terminals
-                COLOR_BG_SLATE_GREY=$(tput setab 235)   # Background color for dark slate grey
+                export COLOR_ORANGE=$(tput setaf 214)  # Orange for 256-color terminals
+                export COLOR_GREEN=$(tput setaf 46)   # Green for 256-color terminals
+                export COLOR_BLUE=$(tput setaf 33)    # Blue for 256-color terminals
+                export COLOR_DARK_SLATE_GREY=$(tput setaf 235)  # Dark Slate Grey for 256-color terminals
+                export COLOR_BG_SLATE_GREY=$(tput setab 235)   # Background color for dark slate grey
                 ;;
             "16")
                 # Fall back to 16 colors
-                COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 16-color terminals
-                COLOR_GREEN=$(tput setaf 2)    # Green for 16-color terminals
-                COLOR_BLUE=$(tput setaf 4)     # Blue for 16-color terminals
-                COLOR_DARK_SLATE_GREY=$(tput setaf 8)  # Grey for 16-color terminals
-                COLOR_BG_SLATE_GREY=$(tput setab 8)   # Background color for grey
+                export COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 16-color terminals
+                export COLOR_GREEN=$(tput setaf 2)    # Green for 16-color terminals
+                export COLOR_BLUE=$(tput setaf 4)     # Blue for 16-color terminals
+                export COLOR_DARK_SLATE_GREY=$(tput setaf 8)  # Grey for 16-color terminals
+                export COLOR_BG_SLATE_GREY=$(tput setab 8)   # Background color for grey
                 ;;
             *)
                 # Default fallback for terminals with fewer than 16 colors
-                COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 8-color terminals
-                COLOR_GREEN=$(tput setaf 2)    # Green for 8-color terminals
-                COLOR_BLUE=$(tput setaf 4)     # Blue for 8-color terminals
-                COLOR_DARK_SLATE_GREY=$(tput setaf 0)  # Black for 8-color terminals
-                COLOR_BG_SLATE_GREY=$(tput setab 0)   # Background color for black
+                export COLOR_ORANGE=$(tput setaf 3)   # Bright yellow for 8-color terminals
+                export COLOR_GREEN=$(tput setaf 2)    # Green for 8-color terminals
+                export COLOR_BLUE=$(tput setaf 4)     # Blue for 8-color terminals
+                export COLOR_DARK_SLATE_GREY=$(tput setaf 0)  # Black for 8-color terminals
+                export COLOR_BG_SLATE_GREY=$(tput setab 0)   # Background color for black
                 ;;
         esac
 
-        COLOR_RESET_FG="\e[39m"           # Reset only the foreground color
-        COLOR_RESET_BG="\e[49m"           # Reset only the background color
+        export COLOR_RESET_FG="\e[39m"           # Reset only the foreground color
+        export COLOR_RESET_BG="\e[49m"           # Reset only the background color
     fi
 }
 
