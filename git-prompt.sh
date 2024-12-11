@@ -248,7 +248,7 @@ cache_colors() {
 }
 
 # Function to detect versions of plenv, goenv, and luaenv, with fallback for Perl
-detect_env_versions() {
+_detect_env_versions() {
     cache_colors
     local versions=""
 
@@ -295,6 +295,24 @@ detect_env_versions() {
 
     # Trim leading/trailing whitespace and return result
     echo "$versions" | sed 's/^ *//;s/ *$//'
+}
+
+detect_env_versions() {
+    cache_colors
+    local versions
+    versions=$(_detect_env_versions)
+
+    # Define octal representations for triangles
+    # Left triangle (octal: \342\226\220, Unicode: U+25C0)
+    local arrow_left=$'\342\226\220'
+    # Right triangle (octal: \342\226\236, Unicode: U+25B6)
+    local arrow_right=$'\342\226\236'
+
+    if [ -n "$HAVE_POWERLINE" ] && [ "$HAVE_POWERLINE" = "1" ] && [ "$TERMINAL_COLORS" != "16" ]; then
+        echo -n "${COLOR_DARK_SLATE_GREY}${arrow_left}${COLOR_BG_SLATE_GREY}${versions}${COLOR_RESET_FG}${COLOR_DARK_SLATE_GREY}${arrow_right}${COLOR_RESET_FG}"
+    else
+        echo -n "[ $versions ]"
+    fi
 }
 
 cwd_truncate() {
