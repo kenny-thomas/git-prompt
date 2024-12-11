@@ -310,7 +310,7 @@ detect_env_versions() {
 
     if [ -n "$HAVE_POWERLINE" ] && [ "$HAVE_POWERLINE" = "1" ] && [ "$TERMINAL_COLORS" != "16" ]; then
         echo -n "${COLOR_DARK_SLATE_GREY}${arrow_left}${COLOR_BG_SLATE_GREY}${versions}${COLOR_RESET_FG}${COLOR_DARK_SLATE_GREY}${arrow_right}${COLOR_RESET_FG}"
-    else
+    elif [ -n "$versions" ]; then
         echo -n "[ $versions ]"
     fi
 }
