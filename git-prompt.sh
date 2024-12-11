@@ -256,7 +256,7 @@ detect_env_versions() {
     if command -v plenv >/dev/null 2>&1; then
         local plenv_version
         plenv_version=$(plenv version 2>/dev/null | awk '{print $1}')
-        if [ -n "$plenv_version" ]; then
+        if [ "$plenv_version" != "system" ] && [ -n "$plenv_version" ]; then
             versions="$versions ${COLOR_ORANGE}plenv:${plenv_version}${COLOR_RESET_FG}"
         fi
     fi
@@ -279,7 +279,7 @@ detect_env_versions() {
     if command -v goenv >/dev/null 2>&1; then
         local goenv_version
         goenv_version=$(goenv version 2>/dev/null | awk '{print $1}')
-        if [ -n "$goenv_version" ]; then
+        if [ "$goenv_version" != "system" ] && [ -n "$goenv_version" ]; then
             versions="$versions ${COLOR_GREEN}goenv:${goenv_version}${COLOR_RESET_FG}"
         fi
     fi
@@ -288,7 +288,7 @@ detect_env_versions() {
     if command -v luaenv >/dev/null 2>&1; then
         local luaenv_version
         luaenv_version=$(luaenv version 2>/dev/null | awk '{print $1}')
-        if [ -n "$luaenv_version" ]; then
+        if [ "$luaenv_version" != "system" ] && [ -n "$luaenv_version" ]; then
             versions="$versions ${COLOR_BLUE}luaenv:${luaenv_version}${COLOR_RESET_FG}"
         fi
     fi
