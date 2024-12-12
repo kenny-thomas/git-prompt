@@ -226,8 +226,9 @@ cache_colors() {
                 ;;
         esac
 
-        export COLOR_RESET_FG="\e[39m"           # Reset only the foreground color
-        export COLOR_RESET_BG="\e[49m"           # Reset only the background color
+        COLOR_RESET="\[\e[0m\]"              # Reset all attributes
+        COLOR_RESET_FG="\[\e[39m\]"          # Reset foreground
+        COLOR_RESET_BG="\[\e[49m\]"          # Reset background
     fi
 }
 cache_colors
