@@ -137,17 +137,68 @@
 
             bw_bold='\['`tput bold`'\]'
 
-        cols=`tput colors`                              # in emacs shell-mode tput colors returns -1
-        if [[ -n "$cols" && $cols -ge 80 ]];  then       #  if terminal supports colors
-             yellow='\['`tput sgr0; tput setaf 184`'\]'
-            magenta='\['`tput sgr0; tput setaf 162`'\]'
-                RED='\['`tput setaf 196; tput bold`'\]'
-              GREEN='\['`tput setaf 40; tput bold`'\]'
-             YELLOW='\['`tput setaf 226; tput bold`'\]'
-               BLUE='\['`tput setaf 75; tput bold`'\]'
-        fi
-        unset cols
+# Cache tput colors value using detect_colors
+detect_colors() {
+    if [ -n "$COLORTERM" ] && [ "$COLORTERM" = "truecolor" ] || [ "$(tput colors)" -ge 16777216 ]; then
+        echo "24bit"
+    elif [ "$(tput colors)" -ge 256 ]; then
+        echo "256"
+    else
+        echo "16"
+    fi
+}
 
+# Make sure we rebuild the cache on reload
+unset COLOR_ORANGE
+
+# Make sure we rebuild the cache on reload
+unset COLOR_ORANGE
+# Cache the value of tput colors in a global variable
+cache_colors() {
+    if [ -z "${COLOR_ORANGE:-}" ]; then
+        TERMINAL_COLORS=$(detect_colors)
+        case "$TERMINAL_COLORS" in
+            "24bit")
+                COLOR_ORANGE='\['"\e[38;2;255;140;0m"'\]'   # Orange (RGB)
+                COLOR_GREEN='\['"\e[38;2;50;205;50m"'\]'    # Green (RGB)
+                COLOR_BLUE='\['"\e[38;2;30;144;255m"'\]'    # Blue (RGB)
+                COLOR_DARK_SLATE_GREY='\['"\e[38;2;47;79;79m"'\]'  # Dark slate grey (RGB)
+                COLOR_BG_SLATE_GREY='\['"\e[48;2;47;79;79m"'\]'   # Slate grey background (RGB)
+                yellow='\['"$(printf '\033[38;2;255;215;0m')"'\]'
+                magenta='\['"$(printf '\033[38;2;255;0;135m')"'\]'
+                RED='\['"$(printf '\033[1;38;2;255;0;0m')"'\]'
+                GREEN='\['"$(printf '\033[1;38;2;0;255;0m')"'\]'
+                YELLOW='\['"$(printf '\033[1;38;2;255;255;0m')"'\]'
+                BLUE='\['"$(printf '\033[1;38;2;95;175;255m')"'\]'
+                ;;
+            "256")
+                COLOR_ORANGE='\['"$(tput setaf 214)"'\]'  # Orange
+                COLOR_GREEN='\['"$(tput setaf 46)"'\]'   # Green
+                COLOR_BLUE='\['"$(tput setaf 33)"'\]'    # Blue
+                COLOR_DARK_SLATE_GREY='\['"$(tput setaf 235)"'\]'  # Dark slate grey
+                COLOR_BG_SLATE_GREY='\['"$(tput setab 235)"'\]'   # Slate grey background
+                yellow='\['`tput sgr0; tput setaf 184`'\]'
+                magenta='\['`tput sgr0; tput setaf 162`'\]'
+                RED='\['`tput setaf 196; tput bold`'\]'
+                GREEN='\['`tput setaf 40; tput bold`'\]'
+                YELLOW='\['`tput setaf 226; tput bold`'\]'
+                BLUE='\['`tput setaf 75; tput bold`'\]'
+                ;;
+            "16")
+                COLOR_ORANGE='\['"$(tput setaf 3)"'\]'   # Yellow for 16-color fallback
+                COLOR_GREEN='\['"$(tput setaf 2)"'\]'    # Green for 16-color fallback
+                COLOR_BLUE='\['"$(tput setaf 4)"'\]'     # Blue for 16-color fallback
+                COLOR_DARK_SLATE_GREY='\['"$(tput setaf 8)"'\]'  # Grey for 16-color fallback
+                COLOR_BG_SLATE_GREY='\['"$(tput setab 8)"'\]'   # Background grey
+                ;;
+        esac
+
+        COLOR_RESET="\[\e[0m\]"              # Reset all attributes
+        COLOR_RESET_FG="\[\e[39m\]"          # Reset foreground
+        COLOR_RESET_BG="\[\e[49m\]"          # Reset background
+    fi
+}
+cache_colors
 
 
         on=''
@@ -185,53 +236,6 @@
 
         export who_where
 
-# Cache tput colors value using detect_colors
-detect_colors() {
-    if [ -n "$COLORTERM" ] && [ "$COLORTERM" = "truecolor" ] || [ "$(tput colors)" -ge 16777216 ]; then
-        echo "24bit"
-    elif [ "$(tput colors)" -ge 256 ]; then
-        echo "256"
-    else
-        echo "16"
-    fi
-}
-
-# Make sure we rebuild the cache on reload
-unset COLOR_ORANGE
-# Cache the value of tput colors in a global variable
-cache_colors() {
-    if [ -z "${COLOR_ORANGE:-}" ]; then
-        TERMINAL_COLORS=$(detect_colors)
-        case "$TERMINAL_COLORS" in
-            "24bit")
-                COLOR_ORANGE='\['"\e[38;2;255;140;0m"'\]'   # Orange (RGB)
-                COLOR_GREEN='\['"\e[38;2;50;205;50m"'\]'    # Green (RGB)
-                COLOR_BLUE='\['"\e[38;2;30;144;255m"'\]'    # Blue (RGB)
-                COLOR_DARK_SLATE_GREY='\['"\e[38;2;47;79;79m"'\]'  # Dark slate grey (RGB)
-                COLOR_BG_SLATE_GREY='\['"\e[48;2;47;79;79m"'\]'   # Slate grey background (RGB)
-                ;;
-            "256")
-                COLOR_ORANGE='\['"$(tput setaf 214)"'\]'  # Orange
-                COLOR_GREEN='\['"$(tput setaf 46)"'\]'   # Green
-                COLOR_BLUE='\['"$(tput setaf 33)"'\]'    # Blue
-                COLOR_DARK_SLATE_GREY='\['"$(tput setaf 235)"'\]'  # Dark slate grey
-                COLOR_BG_SLATE_GREY='\['"$(tput setab 235)"'\]'   # Slate grey background
-                ;;
-            "16")
-                COLOR_ORANGE='\['"$(tput setaf 3)"'\]'   # Yellow for 16-color fallback
-                COLOR_GREEN='\['"$(tput setaf 2)"'\]'    # Green for 16-color fallback
-                COLOR_BLUE='\['"$(tput setaf 4)"'\]'     # Blue for 16-color fallback
-                COLOR_DARK_SLATE_GREY='\['"$(tput setaf 8)"'\]'  # Grey for 16-color fallback
-                COLOR_BG_SLATE_GREY='\['"$(tput setab 8)"'\]'   # Background grey
-                ;;
-        esac
-
-        COLOR_RESET="\[\e[0m\]"              # Reset all attributes
-        COLOR_RESET_FG="\[\e[39m\]"          # Reset foreground
-        COLOR_RESET_BG="\[\e[49m\]"          # Reset background
-    fi
-}
-cache_colors
 
 # Function to detect versions of plenv, goenv, and luaenv, with fallback for Perl
 _detect_env_versions() {
