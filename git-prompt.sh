@@ -133,7 +133,7 @@
                CYAN='\['`tput setaf 6; tput bold`'\]'
               WHITE='\['`tput setaf 7; tput bold`'\]'
 
-                dim='\['`tput sgr0; tput setaf p1`'\]'  # half-bright
+                dim='\['`tput sgr0; tput dim`'\]'  # half-bright
 
             bw_bold='\['`tput bold`'\]'
 
